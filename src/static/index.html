@@ -46,5 +46,50 @@
     </footer>
 
     <script src="app.js"></script>
+    <script>
+      // Enhance activity cards to show participants as a styled bulleted list
+      document.addEventListener("DOMContentLoaded", () => {
+        const activitiesList = document.getElementById("activities-list");
+
+        // Fetch activities from the backend
+        fetch("/activities")
+          .then((res) => res.json())
+          .then((activities) => {
+            activitiesList.innerHTML = "";
+            Object.entries(activities).forEach(([name, info]) => {
+              const card = document.createElement("div");
+              card.className = "activity-card";
+
+              card.innerHTML = `
+                <h4>${name}</h4>
+                <p>${info.description}</p>
+                <p><strong>Schedule:</strong> ${info.schedule}</p>
+                <p><strong>Max Participants:</strong> ${info.max_participants}</p>
+                <div class="participants-section">
+                  <strong>Participants:</strong>
+                  ${
+                    info.participants.length > 0
+                      ? `<ul class="participants-list">
+                          ${info.participants
+                            .map(
+                              (email) =>
+                                `<li><span class="participant-badge">${email
+                                  .split("@")[0]
+                                  .replace(
+                                    /(^\w|\.\w)/g,
+                                    (m) => `<b>${m.toUpperCase()}</b>`
+                                  )}</span> <span class="participant-email">&lt;${email}&gt;</span></li>`
+                            )
+                            .join("")}
+                        </ul>`
+                      : `<span class="no-participants">No participants yet</span>`
+                  }
+                </div>
+              `;
+              activitiesList.appendChild(card);
+            });
+          });
+      });
+    </script>
   </body>
 </html>
